@@ -1,0 +1,32 @@
+## Interface: 16001
+## AllowLoadGameType: camelot, forever
+## ExcludeLoadGameType: standard, classic
+## Title: Retail Spellbook
+## Notes: Spellbook organised like retail: Class, General and Pet tabs with a header per school, search and hide passives.
+## Notes-esES: Libro de hechizos organizado como en retail: pestañas Clase, General y Mascota con un encabezado por escuela, buscador y ocultar pasivas.
+## Notes-esMX: Libro de hechizos organizado como en retail: pestañas Clase, General y Mascota con un encabezado por escuela, buscador y ocultar pasivas.
+## Author: Nico
+## Version: @project-version@
+## IconTexture: Interface\Icons\INV_Misc_Book_09
+## SavedVariables: RetailSpellbookDB
+## SavedVariablesPerCharacter: RetailSpellbookCharDB
+## AddonCompartmentFunc: RetailSpellbook_OnAddonCompartmentClick
+## AddonCompartmentFuncOnEnter: RetailSpellbook_OnAddonCompartmentEnter
+## AddonCompartmentFuncOnLeave: RetailSpellbook_OnAddonCompartmentLeave
+## X-Game: [Game]
+## X-Family: [Family]
+## X-Flavor: Forever
+## X-License: MIT
+## X-Curse-Project-ID: 0
+## X-Wago-ID: 0
+
+Locales\enUS.lua
+Locales\esES.lua
+Detect.lua
+Identity.lua
+Secrets.lua
+Core.lua
+Config.lua
+Slash.lua
+Data.lua
+Book.lua
