@@ -1,7 +1,7 @@
 ## Interface: 16001
 ## AllowLoadGameType: camelot, forever
 ## ExcludeLoadGameType: standard, classic
-## Title: Retail Spellbook
+## Title: Retail-Style Spellbook
 ## Notes: Spellbook organised like retail: Class, General and Pet tabs with a header per school, search and hide passives.
 ## Notes-esES: Libro de hechizos organizado como en retail: pestañas Clase, General y Mascota con un encabezado por escuela, buscador y ocultar pasivas.
 ## Notes-esMX: Libro de hechizos organizado como en retail: pestañas Clase, General y Mascota con un encabezado por escuela, buscador y ocultar pasivas.

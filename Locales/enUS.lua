@@ -9,7 +9,7 @@ local L = setmetatable({}, {
 })
 ns.L = L
 
-L.ADDON_TITLE = "Retail Spellbook"
+L.ADDON_TITLE = "Retail-Style Spellbook"
 L.LOADED = "loaded. Your spellbook key opens it; /libro toggles it, /retailspellbook config for options."
 L.SLASH_HELP = "Commands: /retailspellbook [config | debug | reset]; nothing opens the book"
 L.ERR_COMBAT = "Not available in combat; try again when combat ends."
