@@ -18,6 +18,14 @@ Se abre con la **tecla del libro** que ya tengas (P por defecto) y con `/libro`.
 la tecla del libro» devuelve la tecla al libro de Blizzard. El botón del menú inferior sigue abriendo
 el de Blizzard.
 
+## Con What's Training?
+
+What's Training? pinta su lista de hechizos por aprender encima del libro de Blizzard, que este
+sustituye, así que con él solo no se veía. Si está instalado, el libro muestra abajo a la izquierda
+el botón **«Por aprender (N)»**: N son los hechizos disponibles ya en tu instructor y, al pasar el
+ratón, su coste total. El clic abre la ventana de What's Training (la misma que `/wt`), con la lista,
+los precios y dónde está el instructor. Sin ese addon el botón no aparece.
+
 ## Por qué es un libro propio
 
 El de Blizzard lanza los hechizos desde su propio código; si un addon cambia cómo arma sus pestañas,
@@ -34,7 +42,7 @@ sí funcionan). Se actualiza al salir de combate.
 ## Estado
 
 0.1.0 (05-11-2026): pasa las comprobaciones fuera del juego (luacheck, StyLua, LuaLS, API de Forever,
-95 tests). **Sin probar en el cliente.** Pruebas pendientes en el juego:
+99 tests). **Sin probar en el cliente.** Pruebas pendientes en el juego:
 
 1. Abrir con P: salen las pestañas Clase / General y los encabezados por escuela.
 2. Clic en un hechizo lo lanza sin error de «acción bloqueada» (BugSack).
@@ -43,3 +51,5 @@ sí funcionan). Se actualiza al salir de combate.
 5. Con mascota (cazador o brujo): pestaña Mascota, clic derecho cambia el autolanzamiento.
 6. Hechizos con desplegable (si los hay en tu clase): el clic abre el desplegable.
 7. Que las texturas del pergamino y el divisor de encabezado se vean (atlas de Blizzard).
+8. Con What's Training activo: abrir con P, ver «Por aprender (N)» abajo a la izquierda, el coste en
+   su tooltip, y que el clic abra la ventana de What's Training con los hechizos y su precio.

@@ -361,6 +361,67 @@ local function CreateNavButton(direction)
     return button
 end
 
+--------------------------------------------------------------------------------------------------
+-- What's Training? (si está instalado)
+--------------------------------------------------------------------------------------------------
+
+local function TrainingSummaryText(count, cost)
+    local money = GetMoneyString and GetMoneyString(cost, true) or tostring(cost)
+    return L.TRAINING_SUMMARY:format(count, money)
+end
+
+-- Se comprueba al abrir el libro, no al cargar: What's Training carga después (orden alfabético).
+local function UpdateTraining()
+    local button = book and book.TrainingButton
+    if not button then
+        return
+    end
+    local Training = ns.Training
+    local available = Training.IsAvailable()
+    button:SetShown(available)
+    if not available then
+        return
+    end
+    local count = Training.Summary()
+    if count then
+        button:SetText(L.TRAINING_COUNT:format(count))
+    else
+        button:SetText(L.TRAINING)
+    end
+    Training.Subscribe(function()
+        if book:IsShown() then
+            UpdateTraining()
+        end
+    end)
+end
+
+local function Training_OnEnter(self)
+    GameTooltip:SetOwner(self, "ANCHOR_TOP")
+    GameTooltip:SetText(L.TRAINING_TITLE)
+    local count, cost = ns.Training.Summary()
+    if count then
+        GameTooltip:AddLine(TrainingSummaryText(count, cost), 1, 1, 1)
+    end
+    GameTooltip:AddLine(L.TRAINING_HINT, nil, nil, nil, true)
+    GameTooltip:Show()
+end
+
+local function CreateTrainingButton()
+    local button = CreateFrame("Button", nil, book, "UIPanelButtonTemplate")
+    button:SetSize(170, 22)
+    button:SetPoint("BOTTOMLEFT", book, "BOTTOMLEFT", 24, 20)
+    button:SetText(L.TRAINING)
+    button:SetScript("OnClick", function()
+        ns.Training.Open()
+    end)
+    button:SetScript("OnEnter", Training_OnEnter)
+    button:SetScript("OnLeave", function()
+        GameTooltip:Hide()
+    end)
+    button:Hide()
+    book.TrainingButton = button
+end
+
 local function CreateBook()
     book = CreateFrame("Frame", "RetailSpellbookFrame", UIParent, "PortraitFrameTemplate, SecureHandlerBaseTemplate")
     book:SetSize(WIDTH, HEIGHT)
@@ -487,6 +548,7 @@ local function CreateBook()
         PlaySound(SOUNDKIT and SOUNDKIT.IG_SPELLBOOK_OPEN or 829)
         passives:SetChecked(ns.db.hidePassives)
         module:Refresh(true)
+        UpdateTraining()
     end)
     book:HookScript("OnHide", function()
         PlaySound(SOUNDKIT and SOUNDKIT.IG_SPELLBOOK_CLOSE or 830)
@@ -494,6 +556,7 @@ local function CreateBook()
 
     tinsert(UISpecialFrames, book:GetName())
     CreatePageWidgets()
+    CreateTrainingButton()
     ApplyPosition()
 end
 

@@ -33,3 +33,8 @@ L.OPT_REPLACE_KEY_TT = "La tecla del libro de Blizzard abre este en su lugar. Si
 L.OPT_HIDE_PASSIVES_TT = "Oculta los hechizos pasivos, como la opción del libro de retail."
 L.OPT_SCALE = "Escala"
 L.OPT_SCALE_TT = "Tamaño del libro."
+
+L.TRAINING = "Por aprender"
+L.TRAINING_COUNT = "Por aprender (%d)"
+L.TRAINING_SUMMARY = "%d disponibles ya en tu instructor: %s"
+L.TRAINING_HINT = "Clic: abre What's Training con lo que puedes aprender, su coste y dónde."

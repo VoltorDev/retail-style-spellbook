@@ -36,3 +36,10 @@ L.OPT_REPLACE_KEY_TT =
 L.OPT_HIDE_PASSIVES_TT = "Hides passive spells, as the option of the retail spellbook."
 L.OPT_SCALE = "Scale"
 L.OPT_SCALE_TT = "Size of the spellbook."
+
+-- What's Training? (si está instalado): botón del libro que abre su ventana.
+L.TRAINING = "To learn"
+L.TRAINING_COUNT = "To learn (%d)"
+L.TRAINING_TITLE = "What's Training?"
+L.TRAINING_SUMMARY = "%d available now at your trainer: %s"
+L.TRAINING_HINT = "Click: opens What's Training with what you can learn, its cost and where."

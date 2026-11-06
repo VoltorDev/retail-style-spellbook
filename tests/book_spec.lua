@@ -284,3 +284,99 @@ describe("tecla del libro", function()
         assert(snippet:find("book:Hide()", 1, true))
     end)
 end)
+
+-- What's Training? dibuja su lista encima del libro de Blizzard; con este libro abierto en su lugar
+-- no se veía. El libro ofrece un botón que abre su ventana, con el recuento de su API pública.
+describe("What's Training?", function()
+    -- WT_API simulada con la forma de su Api.lua (version 1): Status, Event, IsReady, GetSpells,
+    -- RegisterCallback(owner, event, fn).
+    local function fakeApi(spells)
+        local api = { callbacks = {}, ready = true }
+        api.Status = { AVAILABLE = "available", NEXTLEVEL = "nextLevel", KNOWN = "known" }
+        api.Event = { READY = "Ready", SPELLS_CHANGED = "SpellsChanged", LEVEL_CHANGED = "LevelChanged" }
+        api.IsReady = function()
+            return api.ready
+        end
+        api.GetSpells = function()
+            return spells
+        end
+        api.RegisterCallback = function(_, event, fn)
+            api.callbacks[event] = fn
+        end
+        return api
+    end
+
+    local function bootWith(api)
+        local env, ns = boot({
+            globals = {
+                WT_API = api,
+                GetMoneyString = function(copper)
+                    return copper .. "c"
+                end,
+            },
+        })
+        local opened = 0
+        env.SlashCmdList.WHATSTRAINING = function()
+            opened = opened + 1
+        end
+        return env, ns, function()
+            return opened
+        end
+    end
+
+    local SPELLS = {
+        { id = 1, status = "available", cost = 100 },
+        { id = 2, status = "available", cost = 250 },
+        { id = 3, status = "nextLevel", cost = 900 },
+        { id = 4, status = "known", cost = 50 },
+    }
+
+    it("sin What's Training no hay botón", function()
+        local env = boot()
+        open(env)
+        assert.is_false(env.RetailSpellbookFrame.TrainingButton:IsShown())
+    end)
+
+    it("con What's Training el botón cuenta lo disponible y abre su ventana", function()
+        local env, ns, opened = bootWith(fakeApi(SPELLS))
+        open(env)
+        local button = env.RetailSpellbookFrame.TrainingButton
+        assert.is_true(button:IsShown())
+        assert.are.equal("Por aprender (2)", button:GetText())
+        local count, cost = ns.Training.Summary()
+        assert.are.same({ 2, 350 }, { count, cost })
+        button:GetScript("OnClick")(button)
+        assert.are.equal(1, opened())
+        button:GetScript("OnEnter")(button)
+        local first = env.GameTooltip:Calls("AddLine")[1]
+        assert.are.equal("2 disponibles ya en tu instructor: 350c", first[1])
+    end)
+
+    it("se actualiza cuando What's Training avisa de un cambio", function()
+        local spells = { { id = 1, status = "available", cost = 100 } }
+        local api = fakeApi(spells)
+        local env = bootWith(api)
+        open(env)
+        local button = env.RetailSpellbookFrame.TrainingButton
+        assert.are.equal("Por aprender (1)", button:GetText())
+        spells[1].status = "known"
+        api.callbacks.SpellsChanged("SpellsChanged", { 1 })
+        assert.are.equal("Por aprender (0)", button:GetText())
+    end)
+
+    it("si su API no está lista o falla, el botón sigue y abre la ventana", function()
+        local api = fakeApi(SPELLS)
+        api.ready = false
+        local env, ns, opened = bootWith(api)
+        open(env)
+        local button = env.RetailSpellbookFrame.TrainingButton
+        assert.are.equal("Por aprender", button:GetText())
+        api.ready = true
+        api.GetSpells = function()
+            error("API cambiada")
+        end
+        assert.is_nil(ns.Training.Summary())
+        button:GetScript("OnClick")(button)
+        assert.are.equal(1, opened())
+    end)
+end)

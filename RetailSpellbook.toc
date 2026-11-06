@@ -29,4 +29,5 @@ Core.lua
 Config.lua
 Slash.lua
 Data.lua
+Training.lua
 Book.lua

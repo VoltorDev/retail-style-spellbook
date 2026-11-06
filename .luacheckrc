@@ -42,6 +42,8 @@ read_globals = {
     "UnitClass",
     "GENERAL_SPELLS",
     "PET",
+    "GetMoneyString",
+    "WT_API",
     "AbbreviateNumbers",
     "C_AddOns",
     "C_GameRules",
