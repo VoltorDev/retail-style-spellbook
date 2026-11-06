@@ -198,6 +198,19 @@ describe("libro en pantalla", function()
         assert.is_false(env.RetailSpellbookFrame._tabShown[3]) -- sin mascota
     end)
 
+    it("botón de cerrar seguro, visible y por encima del marco", function()
+        local env = boot()
+        open(env)
+        local close = env.RetailSpellbookFrame.SecureCloseButton
+        assert(close, "falta el botón de cerrar")
+        assert.is_true(close:IsShown())
+        assert.are.equal("UIPanelCloseButtonNoScripts, SecureHandlerClickTemplate", close._template)
+        local level = close:LastCall("SetFrameLevel")
+        assert(level and level >= 520, "el botón de cerrar queda por debajo del marco")
+        assert.are.equal(" self:GetParent():Hide() ", attributes(close)._onclick)
+        assert(close:GetNumPoints() > 0 or close:LastCall("SetAllPoints"), "el botón de cerrar no tiene posición")
+    end)
+
     it("pasivas y no aprendidos se ven pero no lanzan nada", function()
         local env = boot()
         open(env)

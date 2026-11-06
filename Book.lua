@@ -449,13 +449,22 @@ local function CreateBook()
     end
 
     -- El botón de cerrar de la plantilla oculta el marco desde código inseguro (bloqueado en combate):
-    -- se cambia por uno seguro.
-    if type(book.CloseButton) == "table" then
-        book.CloseButton:Hide()
-    end
+    -- se cambia por uno seguro que ocupa su mismo hueco (en Forever, 28x28 en TOPRIGHT 0,3).
     local close = CreateFrame("Button", nil, book, "UIPanelCloseButtonNoScripts, SecureHandlerClickTemplate")
-    close:SetPoint("TOPRIGHT", 1, 0)
+    local original = type(book.CloseButton) == "table" and book.CloseButton or nil
+    if original then
+        close:SetAllPoints(original)
+        original:Hide()
+    else
+        close:SetSize(28, 28)
+        close:SetPoint("TOPRIGHT", 0, 3)
+    end
+    -- Por encima del marco metálico y del título (nivel 510 en la plantilla): si no, la esquina de
+    -- Forever lo tapa y el botón no se ve.
+    close:SetFrameLevel((book:GetFrameLevel() or 0) + 520)
     close:SetAttribute("_onclick", [[ self:GetParent():Hide() ]])
+    close:Show()
+    book.SecureCloseButton = close
 
     local left = book:CreateTexture(nil, "BACKGROUND", nil, 2)
     left:SetAtlas("spellbook-Page-Left-C60")

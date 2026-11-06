@@ -3,6 +3,7 @@
 ## Sin publicar
 
 - «Por aprender»: la ventana de What's Training se abría tapada detrás del libro (misma capa) y parecía que el botón no hacía nada. Ahora se abre a la derecha del libro (si nunca la has movido) y por encima.
+- 06-11-2026: el botón de cerrar de la esquina no se veía en Forever: tenía la medida de retail y la esquina metálica del marco lo tapaba. Ahora ocupa el hueco del botón original y queda por encima del marco; sigue cerrando también en combate.
 
 ## 0.2.0 (06-11-2026)
 
