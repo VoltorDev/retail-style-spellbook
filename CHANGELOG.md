@@ -1,5 +1,9 @@
 # Changelog
 
+## Sin publicar
+
+- «Por aprender»: la ventana de What's Training se abría tapada detrás del libro (misma capa) y parecía que el botón no hacía nada. Ahora se abre a la derecha del libro (si nunca la has movido) y por encima.
+
 ## 0.2.0 (06-11-2026)
 
 - 06-11-2026: botón «Por aprender (N)» si What's Training? está instalado: cuenta lo disponible

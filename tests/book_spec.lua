@@ -352,6 +352,42 @@ describe("What's Training?", function()
         assert.are.equal("2 disponibles ya en tu instructor: 350c", first[1])
     end)
 
+    it("su ventana se abre al lado del libro y por encima, no tapada", function()
+        local env = bootWith(fakeApi(SPELLS))
+        local frame = env.CreateFrame("Frame", "WhatsTrainingFloatingFrame", env.UIParent)
+        frame:Hide()
+        local raised = 0
+        frame.Raise = function()
+            raised = raised + 1
+        end
+        env.SlashCmdList.WHATSTRAINING = function()
+            frame:SetShown(not frame:IsShown())
+        end
+        open(env)
+        local button = env.RetailSpellbookFrame.TrainingButton
+        button:GetScript("OnClick")(button)
+        assert.is_true(frame:IsShown())
+        assert.are.equal(1, raised)
+        local point, relativeTo, relativePoint = frame:GetPoint(1)
+        assert.are.same({ "TOPLEFT", env.RetailSpellbookFrame, "TOPRIGHT" }, { point, relativeTo, relativePoint })
+    end)
+
+    it("si el usuario ya movió su ventana, no se recoloca", function()
+        local env = bootWith(fakeApi(SPELLS))
+        env.WT_FloatingFramePoint = { "CENTER", "CENTER", 0, 0 }
+        local frame = env.CreateFrame("Frame", "WhatsTrainingFloatingFrame", env.UIParent)
+        frame:SetPoint("CENTER")
+        frame:Hide()
+        frame.Raise = function() end
+        env.SlashCmdList.WHATSTRAINING = function()
+            frame:Show()
+        end
+        open(env)
+        local button = env.RetailSpellbookFrame.TrainingButton
+        button:GetScript("OnClick")(button)
+        assert.are.equal("CENTER", (frame:GetPoint(1)))
+    end)
+
     it("se actualiza cuando What's Training avisa de un cambio", function()
         local spells = { { id = 1, status = "available", cost = 100 } }
         local api = fakeApi(spells)

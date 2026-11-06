@@ -50,11 +50,22 @@ function Training.Summary()
 end
 
 -- Abre o cierra la ventana de What's Training. Devuelve false si no está cargado.
-function Training.Open()
+-- Su ventana sale centrada y en la misma capa (HIGH) que este libro, que se eleva al pulsar el botón:
+-- quedaba tapada detrás del libro y parecía que el botón no hacía nada. Si se le pasa el libro, la
+-- ventana se pone a su derecha (solo si su usuario no la ha movido nunca) y por encima.
+function Training.Open(anchor)
     if not Training.IsAvailable() then
         return false
     end
     SlashCmdList.WHATSTRAINING("")
+    local frame = rawget(_G, "WhatsTrainingFloatingFrame")
+    if anchor and frame and frame.IsShown and frame:IsShown() then
+        if rawget(_G, "WT_FloatingFramePoint") == nil then
+            frame:ClearAllPoints()
+            frame:SetPoint("TOPLEFT", anchor, "TOPRIGHT", 4, 0)
+        end
+        frame:Raise()
+    end
     return true
 end
 
