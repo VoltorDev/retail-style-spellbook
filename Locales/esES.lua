@@ -31,6 +31,13 @@ L.ERR_COMBAT_TOGGLE = "En combate abre el libro con su tecla (el comando no pued
 L.OPT_REPLACE_KEY = "Abrir con la tecla del libro"
 L.OPT_REPLACE_KEY_TT = "La tecla del libro de Blizzard abre este en su lugar. Sin ella, usa /libro."
 L.OPT_HIDE_PASSIVES_TT = "Oculta los hechizos pasivos, como la opción del libro de retail."
+L.OPT_GROUP_RANKS = "Un hechizo por rango"
+L.OPT_GROUP_RANKS_TT = "Junta los rangos de cada hechizo en una sola entrada y deja elegir cuál lanza con un "
+    .. "desplegable (por defecto, el más alto)."
+L.RANK_PICK = "Elegir rango"
+L.RANK_PICK_TT =
+    "Clic aquí o clic derecho en el hechizo: elige qué rango lanza este botón. Se recuerda por personaje."
+L.ERR_COMBAT_RANK = "En combate no se puede cambiar el rango; sal de combate y vuelve a elegirlo."
 L.OPT_SCALE = "Escala"
 L.OPT_SCALE_TT = "Tamaño del libro."
 

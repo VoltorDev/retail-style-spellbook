@@ -126,8 +126,84 @@ local function Keep(item, options)
     return true
 end
 
+-- Número de rango sacado del subtexto ("Rango 3", "Rank 3"); nil si no lo lleva.
+function Data.RankOf(item)
+    local number = item.subName and item.subName:match("(%d+)")
+    return number and tonumber(number) or nil
+end
+
+-- Copia del rango elegido (por spellID) con la lista completa en `ranks`. Si no hay elección o ya no
+-- está aprendido, el rango aprendido más alto; si no hay ninguno aprendido, el más bajo por aprender.
+function Data.PickRank(ranks, chosenSpellID)
+    local types = ItemTypes()
+    local pick
+    for _, rank in ipairs(ranks) do
+        if chosenSpellID and rank.spellID == chosenSpellID and rank.itemType == types.Spell then
+            pick = rank
+            break
+        end
+    end
+    if not pick then
+        for index = #ranks, 1, -1 do
+            if ranks[index].itemType == types.Spell then
+                pick = ranks[index]
+                break
+            end
+        end
+    end
+    pick = pick or ranks[1]
+    local copy = {}
+    for key, value in pairs(pick) do
+        copy[key] = value
+    end
+    copy.ranks = ranks
+    return copy
+end
+
+-- Forever pone cada rango como una entrada aparte del libro. Esto deja una sola por hechizo (en el
+-- sitio del primer rango) con `ranks` = todos sus rangos, de menor a mayor. Solo junta hechizos del
+-- jugador (aprendidos o por aprender) con el mismo nombre: acciones de mascota y flyouts no tienen rangos.
+function Data.MergeRanks(items, chosen)
+    local types = ItemTypes()
+    local merged, byName = {}, {}
+    for _, item in ipairs(items) do
+        local rankable = (item.itemType == types.Spell or item.itemType == types.FutureSpell) and item.name ~= ""
+        local entry = rankable and byName[item.name] or nil
+        if entry then
+            entry[#entry + 1] = item
+        else
+            entry = { item }
+            merged[#merged + 1] = entry
+            if rankable then
+                byName[item.name] = entry
+            end
+        end
+    end
+    local result = {}
+    for _, ranks in ipairs(merged) do
+        if #ranks == 1 then
+            result[#result + 1] = ranks[1]
+        else
+            local order = {}
+            for index, rank in ipairs(ranks) do
+                order[rank] = index
+            end
+            table.sort(ranks, function(a, b)
+                local ra, rb = Data.RankOf(a), Data.RankOf(b)
+                if ra and rb and ra ~= rb then
+                    return ra < rb
+                end
+                return order[a] < order[b]
+            end)
+            result[#result + 1] = Data.PickRank(ranks, chosen and chosen[ranks[1].name])
+        end
+    end
+    return result
+end
+
 -- Grupos que se ven: los de la pestaña elegida o, si hay búsqueda, lo que coincide en todas, con un
--- encabezado por pestaña (como los resultados de búsqueda de retail).
+-- encabezado por pestaña (como los resultados de búsqueda de retail). Con `groupRanks`, un hechizo
+-- por nombre con todos sus rangos (ver MergeRanks); `chosenRanks[nombre]` = spellID elegido.
 function Data.Visible(categories, selected, options)
     options = options or {}
     local searching = options.query and options.query ~= ""
@@ -136,7 +212,11 @@ function Data.Visible(categories, selected, options)
         if searching or category.key == selected then
             for _, group in ipairs(category.groups) do
                 local items = {}
-                for _, item in ipairs(group.items) do
+                local source = group.items
+                if options.groupRanks then
+                    source = Data.MergeRanks(source, options.chosenRanks)
+                end
+                for _, item in ipairs(source) do
                     if Keep(item, options) then
                         items[#items + 1] = item
                     end

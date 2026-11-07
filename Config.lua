@@ -37,6 +37,18 @@ function module:OnInitialize()
     hidePassives:SetValueChangedCallback(OnSettingChanged)
     Settings.CreateCheckbox(category, hidePassives, L.OPT_HIDE_PASSIVES_TT)
 
+    local groupRanks = Settings.RegisterAddOnSetting(
+        category,
+        addonName .. "_GroupRanks",
+        "groupRanks",
+        db,
+        Settings.VarType.Boolean,
+        L.OPT_GROUP_RANKS,
+        ns.DEFAULTS.groupRanks
+    )
+    groupRanks:SetValueChangedCallback(OnSettingChanged)
+    Settings.CreateCheckbox(category, groupRanks, L.OPT_GROUP_RANKS_TT)
+
     local scale = Settings.RegisterAddOnSetting(
         category,
         addonName .. "_Scale",

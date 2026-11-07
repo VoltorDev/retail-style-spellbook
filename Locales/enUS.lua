@@ -34,6 +34,12 @@ L.OPT_REPLACE_KEY = "Open with the spellbook key"
 L.OPT_REPLACE_KEY_TT =
     "The key bound to the Blizzard spellbook opens this one instead. Without it, use /libro or /retailspellbook."
 L.OPT_HIDE_PASSIVES_TT = "Hides passive spells, as the option of the retail spellbook."
+L.OPT_GROUP_RANKS = "One spell per rank"
+L.OPT_GROUP_RANKS_TT = "Merges the ranks of each spell into a single entry and lets you choose which one it casts "
+    .. "from a dropdown (highest by default)."
+L.RANK_PICK = "Choose rank"
+L.RANK_PICK_TT = "Click here or right-click the spell: choose which rank this button casts. Remembered per character."
+L.ERR_COMBAT_RANK = "The rank cannot be changed in combat; leave combat and choose it again."
 L.OPT_SCALE = "Scale"
 L.OPT_SCALE_TT = "Size of the spellbook."
 

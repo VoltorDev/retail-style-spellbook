@@ -64,6 +64,7 @@ read_globals = {
     "MinimalSliderWithSteppersMixin",
     "RegionalUniqueNamesEnabled",
     "Settings",
+    "MenuUtil",
     "UIParent",
     "UnitGUID",
     "UnitHealth",

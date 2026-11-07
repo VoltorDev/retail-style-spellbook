@@ -429,3 +429,155 @@ describe("What's Training?", function()
         assert.are.equal(1, opened())
     end)
 end)
+
+-- Forever da cada rango como una entrada aparte; el libro deja una por hechizo con desplegable.
+describe("un hechizo por rango", function()
+    local RANKED = {
+        lines = { { "General", 1, 0, 1 }, { "Fuego", 3, 1, 5 } },
+        items = {
+            [1] = spell(6603, "Ataque"),
+            [2] = spell(143, "Bola de Fuego", { subName = "Rango 2" }),
+            [3] = spell(133, "Bola de Fuego", { subName = "Rango 1" }),
+            [4] = spell(145, "Bola de Fuego", { subName = "Rango 3" }),
+            [5] = spell(3140, "Bola de Fuego", { subName = "Rango 4", itemType = FUTURE }),
+            [6] = spell(2136, "Explosión de Fuego", { subName = "Rango 1" }),
+        },
+        pet = {},
+    }
+
+    -- MenuUtil falso: guarda el generador y lo ejecuta con un menú que anota lo que se crea.
+    local function bootRanked()
+        local menu = {}
+        local env, ns = boot({
+            spellbook = RANKED,
+            globals = {
+                MenuUtil = {
+                    CreateContextMenu = function(owner, generator)
+                        menu.owner, menu.title, menu.radios = owner, nil, {}
+                        local root = {}
+                        function root.CreateTitle(_, text)
+                            menu.title = text
+                        end
+                        function root.CreateRadio(_, text, isSelected, setSelected, data)
+                            local radio = { text = text, enabled = true, selected = isSelected(data) }
+                            radio.pick = function()
+                                setSelected(data)
+                            end
+                            function radio.SetEnabled(self, value)
+                                self.enabled = value
+                            end
+                            menu.radios[#menu.radios + 1] = radio
+                            return radio
+                        end
+                        generator(owner, root)
+                    end,
+                },
+            },
+        })
+        return env, ns, menu
+    end
+
+    local function ranksOf(item)
+        local list = {}
+        for _, rank in ipairs(item.ranks) do
+            list[#list + 1] = rank.subName
+        end
+        return list
+    end
+
+    it("junta los rangos en una entrada, ordenados, y elige el aprendido más alto", function()
+        local _, ns = bootRanked()
+        local groups = ns.Data.Visible(ns.Data.Collect(), "class", { groupRanks = true })
+        assert.are.same({ "Bola de Fuego", "Explosión de Fuego" }, names(groups[1]))
+        local bola = groups[1].items[1]
+        assert.are.same({ "Rango 1", "Rango 2", "Rango 3", "Rango 4" }, ranksOf(bola))
+        assert.are.equal(145, bola.spellID) -- rango 3: el 4 aún no está aprendido
+        assert.is_nil(groups[1].items[2].ranks) -- un solo rango: sin desplegable
+    end)
+
+    it("respeta el rango elegido y, si no está aprendido, vuelve al más alto", function()
+        local _, ns = bootRanked()
+        local categories = ns.Data.Collect()
+        local function pick(id)
+            local options = { groupRanks = true, chosenRanks = { ["Bola de Fuego"] = id } }
+            return ns.Data.Visible(categories, "class", options)[1].items[1].spellID
+        end
+        assert.are.equal(133, pick(133))
+        assert.are.equal(145, pick(3140)) -- el 4 no se puede lanzar
+        assert.are.equal(145, pick(999)) -- uno que ya no existe
+    end)
+
+    it("sin la opción sale cada rango por separado", function()
+        local _, ns = bootRanked()
+        local groups = ns.Data.Visible(ns.Data.Collect(), "class", { groupRanks = false })
+        assert.are.equal(5, #groups[1].items)
+    end)
+
+    it("si ningún rango está aprendido, se ve el más bajo", function()
+        local _, ns = bootRanked()
+        local merged = ns.Data.MergeRanks({
+            { itemType = FUTURE, spellID = 2, name = "Nova", subName = "Rango 2" },
+            { itemType = FUTURE, spellID = 1, name = "Nova", subName = "Rango 1" },
+        })
+        assert.are.equal(1, #merged)
+        assert.are.equal(1, merged[1].spellID)
+    end)
+
+    it("en pantalla: un solo botón, con flecha, que lanza el rango elegido", function()
+        local env = bootRanked()
+        open(env)
+        local count = 0
+        for _, button in ipairs(shownButtons(env)) do
+            if button.item.name == "Bola de Fuego" then
+                count = count + 1
+            end
+        end
+        assert.are.equal(1, count)
+        local bola = buttonFor(env, "Bola de Fuego")
+        local attrs = attributes(bola)
+        assert.are.equal("spell", attrs.type)
+        assert.are.equal(145, attrs.spell)
+        assert.are.equal("none", attrs.type2) -- clic derecho = desplegable, no lanza
+        assert.are.equal("Rango 3", bola.SubName:GetText())
+        assert.is_true(bola.RankButton:IsShown())
+        assert.is_false(buttonFor(env, "Explosión de Fuego").RankButton:IsShown())
+    end)
+
+    it("clic derecho abre el desplegable; elegir un rango lo guarda y lo lanza", function()
+        local env, ns, menu = bootRanked()
+        open(env)
+        local bola = buttonFor(env, "Bola de Fuego")
+        bola:GetScript("PostClick")(bola, "RightButton")
+        assert.are.equal("Bola de Fuego", menu.title)
+        assert.are.equal(4, #menu.radios)
+        assert.are.equal("Rango 4 (Aún no aprendido)", menu.radios[1].text) -- del más alto al más bajo
+        assert.is_false(menu.radios[1].enabled)
+        assert.is_true(menu.radios[2].selected)
+        menu.radios[4].pick() -- rango 1
+        assert.are.equal(133, ns.charDB.ranks["Bola de Fuego"])
+        bola = buttonFor(env, "Bola de Fuego")
+        assert.are.equal(133, attributes(bola).spell)
+        assert.are.equal("Rango 1", bola.SubName:GetText())
+    end)
+
+    it("la flecha abre el mismo desplegable", function()
+        local env, _, menu = bootRanked()
+        open(env)
+        local bola = buttonFor(env, "Bola de Fuego")
+        bola.RankButton:GetScript("OnClick")(bola.RankButton)
+        assert.are.equal("Bola de Fuego", menu.title)
+    end)
+
+    it("en combate no cambia el rango y lo explica", function()
+        local env, ns, menu = bootRanked()
+        open(env)
+        local bola = buttonFor(env, "Bola de Fuego")
+        bola:GetScript("PostClick")(bola, "RightButton")
+        env:ClearPrinted()
+        env:SetCombat(true)
+        menu.radios[4].pick()
+        assert(env:Printed():find(ns.L.ERR_COMBAT_RANK, 1, true))
+        assert.is_nil(ns.charDB.ranks and ns.charDB.ranks["Bola de Fuego"])
+        assert.are.equal(145, attributes(bola).spell)
+    end)
+end)

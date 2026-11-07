@@ -10,6 +10,7 @@ ns.DEFAULTS = {
     schema = 1,
     replaceKey = true, -- la tecla del libro de Blizzard abre este
     hidePassives = false,
+    groupRanks = true, -- un hechizo por nombre, con desplegable de rango
     scale = 0.9,
     position = { point = "CENTER", relativePoint = "CENTER", x = 0, y = 40 },
 }

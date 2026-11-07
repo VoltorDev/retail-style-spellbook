@@ -2,6 +2,8 @@
 
 ## Sin publicar
 
+- 07-11-2026: un hechizo por rango. Los rangos de cada hechizo salen en una sola entrada, que lanza el rango aprendido más alto. Con la flecha junto al rango, o con clic derecho en el hechizo, se elige otro; la elección se guarda por personaje. Se puede desactivar en las opciones («Un hechizo por rango»). En combate no se puede cambiar el rango.
+
 - «Por aprender»: la ventana de What's Training se abría tapada detrás del libro (misma capa) y parecía que el botón no hacía nada. Ahora se abre a la derecha del libro (si nunca la has movido) y por encima.
 - 06-11-2026: el botón de cerrar de la esquina no se veía en Forever: tenía la medida de retail y la esquina metálica del marco lo tapaba. Ahora ocupa el hueco del botón original y queda por encima del marco; sigue cerrando también en combate.
 

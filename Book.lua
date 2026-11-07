@@ -63,8 +63,52 @@ local function Button_OnDragStart(self)
     end
 end
 
+-- Texto de un rango en el desplegable: "Rango 3", o el nombre si no trae subtexto.
+local function RankLabel(rank)
+    local text = rank.subName ~= "" and rank.subName or rank.name
+    if rank.itemType == ItemTypes().FutureSpell then
+        text = text .. " (" .. L.NOT_LEARNED .. ")"
+    end
+    return text
+end
+
+-- Desplegable para elegir qué rango lanza el botón. Se guarda por personaje y por nombre del hechizo.
+-- Cambiarlo reasigna un botón seguro, así que en combate no se puede.
+local function OpenRankMenu(owner, item)
+    if not item or not item.ranks then
+        return
+    end
+    MenuUtil.CreateContextMenu(owner, function(_, root)
+        root:CreateTitle(item.name)
+        local function IsSelected(rank)
+            return rank.spellID == item.spellID
+        end
+        local function SetSelected(rank)
+            if InCombatLockdown() then
+                ns:Print(L.ERR_COMBAT_RANK)
+                return
+            end
+            ns.charDB.ranks = ns.charDB.ranks or {}
+            ns.charDB.ranks[item.name] = rank.spellID
+            module:Refresh(true)
+        end
+        for index = #item.ranks, 1, -1 do
+            local rank = item.ranks[index]
+            local radio = root:CreateRadio(RankLabel(rank), IsSelected, SetSelected, rank)
+            if rank.itemType ~= ItemTypes().Spell then
+                radio:SetEnabled(false)
+            end
+        end
+    end)
+end
+
 -- Mayús+clic: enlazar en el chat. El clic seguro no hace nada con Mayús (shift-type1 = "none").
+-- Clic derecho en un hechizo con rangos: elegir rango (type2 = "none", no lanza).
 local function Button_PostClick(self, mouseButton)
+    if self.item and self.item.ranks and mouseButton == "RightButton" then
+        OpenRankMenu(self, self.item)
+        return
+    end
     if self.item and mouseButton == "LeftButton" and IsModifiedClick("CHATLINK") then
         local link = self.item.spellID and C_Spell.GetSpellLink(self.item.spellID)
         if link then
@@ -119,6 +163,32 @@ local function CreateSpellButton(parent)
     sub:SetShadowOffset(0, 0)
     button.SubName = sub
 
+    -- Flecha del desplegable de rangos (solo en hechizos con más de un rango).
+    local rankButton = CreateFrame("Button", nil, button)
+    rankButton:SetSize(18, 18)
+    rankButton:SetPoint("TOPLEFT", name, "BOTTOMLEFT", -3, 2)
+    local arrow = rankButton:CreateTexture(nil, "ARTWORK")
+    arrow:SetAtlas("common-dropdown-a-button")
+    arrow:SetSize(14, 14)
+    arrow:SetPoint("CENTER")
+    rankButton.Arrow = arrow
+    rankButton:SetScript("OnClick", function(self)
+        OpenRankMenu(self, button.item)
+    end)
+    rankButton:SetScript("OnEnter", function(self)
+        arrow:SetAtlas("common-dropdown-a-button-hover")
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText(L.RANK_PICK)
+        GameTooltip:AddLine(L.RANK_PICK_TT, 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    rankButton:SetScript("OnLeave", function()
+        arrow:SetAtlas("common-dropdown-a-button")
+        GameTooltip:Hide()
+    end)
+    rankButton:Hide()
+    button.RankButton = rankButton
+
     button:SetScript("OnEnter", Button_OnEnter)
     button:SetScript("OnLeave", Button_OnLeave)
     button:SetScript("OnDragStart", Button_OnDragStart)
@@ -139,6 +209,9 @@ local function SetActions(button, item)
     if item.itemType == types.Spell and item.spellID then
         button:SetAttribute("type", "spell")
         button:SetAttribute("spell", item.spellID)
+        if item.ranks then
+            button:SetAttribute("type2", "none") -- el clic derecho abre el desplegable de rangos
+        end
     elseif item.itemType == types.PetAction and item.spellID then
         button:SetAttribute("type", "spell")
         button:SetAttribute("spell", item.spellID)
@@ -176,9 +249,12 @@ local function ShowItem(button, entry)
     if item.isPassive then
         sub = (sub ~= "" and sub ~= SPELL_PASSIVE) and (sub .. " - " .. L.PASSIVE) or L.PASSIVE
     elseif item.itemType == types.FutureSpell then
-        sub = L.NOT_LEARNED
+        sub = (item.ranks and sub ~= "") and (sub .. " - " .. L.NOT_LEARNED) or L.NOT_LEARNED
     end
     button.SubName:SetText(sub)
+    -- Con rangos: la flecha del desplegable delante del rango, y el texto corrido a su derecha.
+    button.SubName:SetPoint("TOPLEFT", button.Name, "BOTTOMLEFT", item.ranks and 15 or 0, -2)
+    button.RankButton:SetShown(item.ranks ~= nil)
     UpdateCooldown(button)
     button:Show()
 end
@@ -299,6 +375,8 @@ function module:Refresh(keepSpread)
     local groups = Data.Visible(state.categories, state.tab, {
         hidePassives = ns.db.hidePassives,
         query = state.query,
+        groupRanks = ns.db.groupRanks,
+        chosenRanks = ns.charDB and ns.charDB.ranks,
     })
     state.pages = Data.Paginate(groups, ROWS, COLS)
     if not keepSpread then

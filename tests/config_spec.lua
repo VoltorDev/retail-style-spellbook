@@ -21,7 +21,7 @@ describe("opciones en Settings", function()
         assert.are.equal(0, countKeys(registry.settings))
 
         env:Fire("ADDON_LOADED", env:AddonName(), false)
-        assert.are.equal(3, countKeys(registry.settings))
+        assert.are.equal(4, countKeys(registry.settings))
         assert.are.equal(1, #registry.addOnCategories)
         assert.are.equal(ns.settingsCategory, registry.addOnCategories[1])
         assert.are.equal(ns.L.ADDON_TITLE, ns.settingsCategory:GetName())
@@ -29,6 +29,7 @@ describe("opciones en Settings", function()
         local expected = {
             ReplaceKey = { "replaceKey", "boolean" },
             HidePassives = { "hidePassives", "boolean" },
+            GroupRanks = { "groupRanks", "boolean" },
             Scale = { "scale", "number" },
         }
         for suffix, info in pairs(expected) do
@@ -41,15 +42,15 @@ describe("opciones en Settings", function()
         assert.are.equal(1.25, registry.settings[env:AddonName() .. "_Scale"]:GetValue()) -- no pisa lo guardado
     end)
 
-    it("crea dos casillas y un deslizador con dos decimales", function()
+    it("crea tres casillas y un deslizador con dos decimales", function()
         local env = WowEnv.boot(TOC)
         local controls = env:SettingsRegistry().controls
         local kinds = {}
         for _, control in ipairs(controls) do
             kinds[#kinds + 1] = control.kind
         end
-        assert.are.same({ "Checkbox", "Checkbox", "Slider" }, kinds)
-        local slider = controls[3].options
+        assert.are.same({ "Checkbox", "Checkbox", "Checkbox", "Slider" }, kinds)
+        local slider = controls[4].options
         assert.are.equal(0.5, slider.minValue)
         assert.are.equal(1.5, slider.maxValue)
         local label = slider.formatters[env.MinimalSliderWithSteppersMixin.Label.Right]
