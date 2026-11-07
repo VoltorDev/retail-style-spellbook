@@ -20,7 +20,7 @@ Preparado el 05-11-2026. Paquete: `mods\wow\dist\RetailStyleSpellbook-0.1.0.zip`
 | Versión de juego | **Forever 1.60.1** (Interface 16001). No marcar retail ni Classic |
 | Tipo de fichero | Release (como el resto de addons de Nico) |
 | Avatar | `docs/avatar-curseforge.png` (`mods/herramientas/avatares_curseforge.py retailspellbook`) |
-| Capturas | **Faltan**: el libro abierto en la pestaña de clase. Solo en el juego |
+| Capturas | `docs/screenshots/`: `spellbook-class-tab.png`, `rank-dropdown.png`, `search.png` (cliente en inglés, brujo nivel 5, 07-11-2026) |
 
 ## Descripción (pegar en el editor de CurseForge)
 
@@ -36,6 +36,8 @@ Made for **World of Warcraft: Forever**.
 - Named tabs on top: **your class**, **General** and **Pet** (when you have pet spells).
 - The class tab shows all your schools one after another, each with its own header (Arcane, Fire, Frost...).
 - Two open pages with three columns; turn pages with the arrows or the mouse wheel.
+- **One entry per spell**: ranks are merged and it casts your highest one. The arrow next to the rank (or a
+  right-click) opens a dropdown to pick a lower rank; your choice is saved per character.
 - Search box (searches every tab, ignores accents and case) and a **Hide passives** checkbox.
 - Click to cast, drag to your action bars, Shift-click to link in chat. Pet spells: right-click toggles autocast.
 
@@ -51,7 +53,7 @@ page, tab and search stay as they are (opening, closing and casting still work).
 ## Commands
 
 - `/libro` or `/retailspellbook` — open or close the book (out of combat).
-- `/retailspellbook config` — options: use the spellbook key, hide passives, scale.
+- `/retailspellbook config` — options: use the spellbook key, hide passives, one spell per rank, scale.
 - `/retailspellbook debug` — diagnostics to paste when reporting a problem.
 
 ---

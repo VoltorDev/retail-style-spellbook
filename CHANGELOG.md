@@ -2,6 +2,9 @@
 
 ## Sin publicar
 
+- 07-11-2026: la X del buscador borraba el texto pero dejaba la lista filtrada. Ahora quita el filtro.
+- 07-11-2026: capturas en `docs/screenshots/` para el README y CurseForge.
+
 - 07-11-2026: un hechizo por rango. Los rangos de cada hechizo salen en una sola entrada, que lanza el rango aprendido más alto. Con la flecha junto al rango, o con clic derecho en el hechizo, se elige otro; la elección se guarda por personaje. Se puede desactivar en las opciones («Un hechizo por rango»). En combate no se puede cambiar el rango.
 
 - «Por aprender»: la ventana de What's Training se abría tapada detrás del libro (misma capa) y parecía que el botón no hacía nada. Ahora se abre a la derecha del libro (si nunca la has movido) y por encima.

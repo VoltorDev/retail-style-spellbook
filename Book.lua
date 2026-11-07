@@ -574,11 +574,14 @@ local function CreateBook()
     local search = CreateFrame("EditBox", nil, book, "SearchBoxTemplate")
     search:SetSize(200, 20)
     search:SetPoint("TOPRIGHT", book, "TOPRIGHT", -170, -38)
-    search:HookScript("OnTextChanged", function(self, userInput)
-        if not userInput then
+    -- Sin mirar userInput: la X del buscador borra el texto por código y también debe quitar el filtro.
+    -- Lo que ya coincide con state.query (p. ej. SelectTab) no vuelve a refrescar.
+    search:HookScript("OnTextChanged", function(self)
+        local text = self:GetText() or ""
+        if text == state.query then
             return
         end
-        state.query = self:GetText() or ""
+        state.query = text
         module:Refresh(false)
     end)
     book.SearchBox = search

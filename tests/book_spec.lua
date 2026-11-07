@@ -238,6 +238,19 @@ describe("libro en pantalla", function()
         assert.is_nil(buttonFor(env, "Diplomacia"))
     end)
 
+    it("la X del buscador (texto borrado por código) quita el filtro", function()
+        local env = boot()
+        open(env)
+        local search = env.RetailSpellbookFrame.SearchBox
+        local changed = search:GetScript("OnTextChanged")
+        search:SetText("escarcha")
+        changed(search, true)
+        assert.is_nil(buttonFor(env, "Bola de Fuego"))
+        search:SetText("")
+        changed(search, false) -- la X de SearchBoxTemplate lo hace sin userInput
+        assert(buttonFor(env, "Bola de Fuego"), "el filtro sigue tras borrar con la X")
+    end)
+
     it("arrastrar recoge el hueco del libro", function()
         local env = boot()
         open(env)
